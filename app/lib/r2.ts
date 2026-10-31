@@ -70,8 +70,14 @@ export async function deleteFile(key: string): Promise<void> {
         Key: key,
       })
     );
-  } catch {
-    // ignore
+  } catch (err: any) {
+    // 删除失败不应阻断主流程（例如替换头像时旧图可能已不存在），
+    // 但必须留下痕迹，否则 R2 凭证问题时永远查不出来。
+    console.warn(
+      "R2 deleteFile failed:",
+      err?.Code || err?.name || err?.message,
+      { bucket, key }
+    );
   }
 }
 
